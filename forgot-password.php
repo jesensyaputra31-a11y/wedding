@@ -27,7 +27,7 @@ if(isset($_POST['request_reset'])) {
         if(mysqli_query($conn, $update_query)) {
             $_SESSION['reset_email'] = $email;
             $_SESSION['reset_token'] = $token;
-            $success = "✨ Reset code has been generated. ✨";
+            $success = "Reset code has been generated.";
             $step = 2;
         } else {
             $error = "Failed to generate token.";
@@ -56,7 +56,7 @@ if(isset($_POST['reset_password'])) {
             $update_query = "UPDATE users SET password = '$hashed_password', reset_token = NULL, reset_expires = NULL WHERE email = '{$user['email']}'";
             
             if(mysqli_query($conn, $update_query)) {
-                $success = "🎉 Password successfully reset! 🎉";
+                $success = "Password successfully reset! Please login with your new password.";
                 unset($_SESSION['reset_email']);
                 unset($_SESSION['reset_token']);
                 $step = 3;
@@ -89,10 +89,9 @@ if(isset($_POST['reset_password'])) {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             position: relative;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        /* Video Background */
         .bg-video {
             position: fixed;
             top: 0;
@@ -101,7 +100,7 @@ if(isset($_POST['reset_password'])) {
             height: 100%;
             object-fit: cover;
             z-index: 0;
-            filter: brightness(0.5) contrast(1.1);
+            filter: brightness(0.45) contrast(1.1);
         }
 
         .overlay {
@@ -111,55 +110,30 @@ if(isset($_POST['reset_password'])) {
             width: 100%;
             height: 100%;
             background: linear-gradient(135deg, 
-                rgba(0,0,0,0.65) 0%, 
+                rgba(0,0,0,0.6) 0%, 
                 rgba(60,30,45,0.5) 50%,
-                rgba(0,0,0,0.65) 100%);
+                rgba(0,0,0,0.6) 100%);
             z-index: 1;
         }
 
-        /* ========== BUNGA BESAR DI SAMPING ========== */
-        .flower-large {
+        .flower {
             position: fixed;
             z-index: 2;
             pointer-events: none;
-            opacity: 0.5;
+            opacity: 0.6;
         }
-        .flower-left {
-            bottom: 5%;
-            left: 2%;
-            width: 180px;
-            animation: floatSlow 12s ease-in-out infinite;
-        }
-        .flower-right {
-            top: 5%;
-            right: 2%;
-            width: 150px;
-            animation: floatSlow 10s ease-in-out infinite reverse;
-        }
-
-        @keyframes floatSlow {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(10deg); }
-        }
-
-        /* Bunga kecil dekoratif */
-        .flower-small {
-            position: fixed;
-            z-index: 2;
-            pointer-events: none;
-            opacity: 0.4;
-        }
-        .fs-1 { top: 15%; left: 8%; width: 50px; animation: floatFlower 6s infinite; }
-        .fs-2 { top: 70%; right: 10%; width: 60px; animation: floatFlower 7s infinite 1s; }
-        .fs-3 { bottom: 20%; left: 12%; width: 40px; animation: floatFlower 5s infinite 2s; }
-        .fs-4 { top: 40%; right: 5%; width: 45px; animation: floatFlower 8s infinite 0.5s; }
+        .flower-1 { top: 5%; left: 3%; width: 120px; animation: floatFlower 8s ease-in-out infinite; }
+        .flower-2 { top: 8%; right: 4%; width: 100px; animation: floatFlower 10s ease-in-out infinite reverse; }
+        .flower-3 { bottom: 8%; left: 5%; width: 90px; animation: floatFlower 7s ease-in-out infinite 1s; }
+        .flower-4 { bottom: 12%; right: 3%; width: 110px; animation: floatFlower 9s ease-in-out infinite 2s; }
+        .flower-5 { top: 40%; left: 8%; width: 50px; animation: floatFlower 6s ease-in-out infinite 0.5s; }
+        .flower-6 { bottom: 25%; right: 7%; width: 60px; animation: floatFlower 7s ease-in-out infinite 1.5s; }
 
         @keyframes floatFlower {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-            50% { transform: translateY(-15px) rotate(5deg); opacity: 0.7; }
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+            50% { transform: translateY(-20px) rotate(5deg); opacity: 0.8; }
         }
 
-        /* Falling Petals */
         .petal {
             position: fixed;
             z-index: 2;
@@ -173,7 +147,6 @@ if(isset($_POST['reset_password'])) {
             to { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
-        /* Container */
         .container {
             position: relative;
             z-index: 3;
@@ -185,43 +158,36 @@ if(isset($_POST['reset_password'])) {
             padding: 40px;
         }
 
-        /* MAIN CARD */
+        /* CARD UTAMA - TANPA GARIS PEMBATAS */
         .reset-card {
             max-width: 500px;
             width: 100%;
             background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(15px);
-            border-radius: 40px;
+            border-radius: 32px;
             padding: 45px 40px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(212, 175, 55, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(212, 175, 55, 0.15);
             animation: fadeInUp 0.6s ease-out;
-            position: relative;
         }
-
-        /* Decorative corners */
-        .reset-card::before,
-        .reset-card::after {
-            content: '✧';
-            position: absolute;
-            font-size: 20px;
-            color: #D4AF37;
-            opacity: 0.6;
-        }
-        .reset-card::before { top: 20px; left: 25px; }
-        .reset-card::after { bottom: 20px; right: 25px; }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        /* Icon */
         .icon-wrapper {
             text-align: center;
             margin-bottom: 25px;
         }
+
         .icon-wrapper i {
-            font-size: 55px;
+            font-size: 48px;
             background: linear-gradient(135deg, #D4AF37, #B8860B);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -230,7 +196,7 @@ if(isset($_POST['reset_password'])) {
 
         .reset-card h1 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 34px;
+            font-size: 32px;
             font-weight: 700;
             color: #1a1a2e;
             text-align: center;
@@ -241,32 +207,13 @@ if(isset($_POST['reset_password'])) {
             text-align: center;
             font-size: 14px;
             color: #888;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
-        /* Kata-kata inspiratif di dalam card */
-        .inspire-text {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 15px;
-            background: linear-gradient(135deg, rgba(212,175,55,0.05), rgba(212,175,55,0.02));
-            border-radius: 20px;
-        }
-        .inspire-text p {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 15px;
-            font-style: italic;
-            color: #b48c5c;
-        }
-        .inspire-text i {
-            color: #D4AF37;
-            margin: 0 5px;
-        }
-
-        /* Form */
         .input-group {
             margin-bottom: 24px;
         }
+
         .input-group label {
             display: block;
             font-size: 11px;
@@ -276,6 +223,7 @@ if(isset($_POST['reset_password'])) {
             color: #b48c5c;
             margin-bottom: 8px;
         }
+
         .input-group input {
             width: 100%;
             padding: 14px 0;
@@ -286,6 +234,7 @@ if(isset($_POST['reset_password'])) {
             transition: all 0.3s;
             background: transparent;
         }
+
         .input-group input:focus {
             outline: none;
             border-bottom-color: #D4AF37;
@@ -303,8 +252,9 @@ if(isset($_POST['reset_password'])) {
             letter-spacing: 1px;
             cursor: pointer;
             transition: all 0.3s;
-            margin: 15px 0 20px;
+            margin: 10px 0 20px;
         }
+
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(212, 175, 55, 0.35);
@@ -319,11 +269,13 @@ if(isset($_POST['reset_password'])) {
             align-items: center;
             gap: 10px;
         }
+
         .error-msg {
             background: rgba(231, 76, 60, 0.1);
             border-left: 3px solid #e74c3c;
             color: #c0392b;
         }
+
         .success-msg {
             background: rgba(46, 125, 50, 0.1);
             border-left: 3px solid #2e7d32;
@@ -337,6 +289,7 @@ if(isset($_POST['reset_password'])) {
             margin: 20px 0;
             text-align: center;
         }
+
         .token-code {
             font-family: monospace;
             font-size: 13px;
@@ -347,7 +300,9 @@ if(isset($_POST['reset_password'])) {
             border-radius: 16px;
             word-break: break-all;
             margin: 10px 0;
+            border: 1px solid #eee;
         }
+
         .copy-btn {
             background: linear-gradient(135deg, #D4AF37, #B8860B);
             border: none;
@@ -363,10 +318,12 @@ if(isset($_POST['reset_password'])) {
             margin-top: 20px;
             font-size: 13px;
         }
+
         .back-link a {
             color: #b48c5c;
             text-decoration: none;
         }
+
         .back-link a:hover {
             color: #D4AF37;
         }
@@ -391,12 +348,6 @@ if(isset($_POST['reset_password'])) {
             .reset-card h1 {
                 font-size: 28px;
             }
-            .flower-left, .flower-right {
-                width: 100px;
-            }
-            .flower-small {
-                display: none;
-            }
         }
     </style>
 </head>
@@ -406,41 +357,29 @@ if(isset($_POST['reset_password'])) {
     </video>
     <div class="overlay"></div>
 
-    <!-- BUNGA BESAR DI SAMPING KIRI KANAN -->
-    <svg class="flower-large flower-left" viewBox="0 0 100 100">
-        <path d="M50,15 Q70,30 85,50 Q70,70 50,85 Q30,70 15,50 Q30,30 50,15Z" fill="#FFD700" opacity="0.7"/>
-        <circle cx="50" cy="50" r="15" fill="#FFA500"/>
-        <circle cx="50" cy="35" r="5" fill="#FFF" opacity="0.8"/>
-        <circle cx="65" cy="50" r="5" fill="#FFF" opacity="0.8"/>
-        <circle cx="50" cy="65" r="5" fill="#FFF" opacity="0.8"/>
-        <circle cx="35" cy="50" r="5" fill="#FFF" opacity="0.8"/>
+    <svg class="flower flower-1" viewBox="0 0 100 100">
+        <path d="M50,20 Q65,35 80,50 Q65,65 50,80 Q35,65 20,50 Q35,35 50,20Z" fill="#FFD700" opacity="0.8"/>
+        <circle cx="50" cy="50" r="12" fill="#FFA500"/>
     </svg>
-
-    <svg class="flower-large flower-right" viewBox="0 0 100 100">
-        <path d="M50,15 Q70,30 85,50 Q70,70 50,85 Q30,70 15,50 Q30,30 50,15Z" fill="#F48FB1" opacity="0.7"/>
-        <circle cx="50" cy="50" r="15" fill="#E91E63"/>
-        <circle cx="50" cy="35" r="5" fill="#FFF" opacity="0.8"/>
-        <circle cx="65" cy="50" r="5" fill="#FFF" opacity="0.8"/>
-        <circle cx="50" cy="65" r="5" fill="#FFF" opacity="0.8"/>
-        <circle cx="35" cy="50" r="5" fill="#FFF" opacity="0.8"/>
+    <svg class="flower flower-2" viewBox="0 0 100 100">
+        <path d="M50,20 Q65,35 80,50 Q65,65 50,80 Q35,65 20,50 Q35,35 50,20Z" fill="#F48FB1" opacity="0.7"/>
+        <circle cx="50" cy="50" r="12" fill="#E91E63"/>
     </svg>
-
-    <!-- BUNGA KECIL DEKORATIF -->
-    <svg class="flower-small fs-1" viewBox="0 0 100 100">
-        <path d="M50,20 Q60,40 80,50 Q60,60 50,80 Q40,60 20,50 Q40,40 50,20Z" fill="#FFD700" opacity="0.6"/>
+    <svg class="flower flower-3" viewBox="0 0 100 100">
+        <path d="M50,20 Q65,35 80,50 Q65,65 50,80 Q35,65 20,50 Q35,35 50,20Z" fill="#FFD700" opacity="0.6"/>
+        <circle cx="50" cy="50" r="10" fill="#F5A623"/>
+    </svg>
+    <svg class="flower flower-4" viewBox="0 0 100 100">
+        <path d="M50,20 Q65,35 80,50 Q65,65 50,80 Q35,65 20,50 Q35,35 50,20Z" fill="#F48FB1" opacity="0.7"/>
+        <circle cx="50" cy="50" r="12" fill="#EC407A"/>
+    </svg>
+    <svg class="flower flower-5" viewBox="0 0 100 100">
+        <path d="M50,20 Q65,35 80,50 Q65,65 50,80 Q35,65 20,50 Q35,35 50,20Z" fill="#FFD700" opacity="0.5"/>
         <circle cx="50" cy="50" r="8" fill="#FFA500"/>
     </svg>
-    <svg class="flower-small fs-2" viewBox="0 0 100 100">
-        <path d="M50,20 Q60,40 80,50 Q60,60 50,80 Q40,60 20,50 Q40,40 50,20Z" fill="#F48FB1" opacity="0.6"/>
+    <svg class="flower flower-6" viewBox="0 0 100 100">
+        <path d="M50,20 Q65,35 80,50 Q65,65 50,80 Q35,65 20,50 Q35,35 50,20Z" fill="#F48FB1" opacity="0.5"/>
         <circle cx="50" cy="50" r="8" fill="#E91E63"/>
-    </svg>
-    <svg class="flower-small fs-3" viewBox="0 0 100 100">
-        <path d="M50,20 Q60,40 80,50 Q60,60 50,80 Q40,60 20,50 Q40,40 50,20Z" fill="#FFD700" opacity="0.5"/>
-        <circle cx="50" cy="50" r="6" fill="#FFA500"/>
-    </svg>
-    <svg class="flower-small fs-4" viewBox="0 0 100 100">
-        <path d="M50,20 Q60,40 80,50 Q60,60 50,80 Q40,60 20,50 Q40,40 50,20Z" fill="#F48FB1" opacity="0.5"/>
-        <circle cx="50" cy="50" r="6" fill="#E91E63"/>
     </svg>
 
     <div id="petals-container"></div>
@@ -453,11 +392,7 @@ if(isset($_POST['reset_password'])) {
 
             <?php if($step == 1): ?>
                 <h1>Forgot Password?</h1>
-                <p class="subtitle">Don't worry, we've got your back</p>
-
-                <div class="inspire-text">
-                    <p><i class="fas fa-heart"></i> "Every love story is beautiful, but yours deserves to be perfectly crafted." <i class="fas fa-heart"></i></p>
-                </div>
+                <p class="subtitle">Enter your email to reset your password</p>
                 
                 <?php if($error): ?>
                     <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <?php echo $error; ?></div>
@@ -475,10 +410,6 @@ if(isset($_POST['reset_password'])) {
             <?php elseif($step == 2): ?>
                 <h1>Reset Password</h1>
                 <p class="subtitle">Enter the token and your new password</p>
-
-                <div class="inspire-text">
-                    <p><i class="fas fa-star"></i> "Your journey to forever starts with a single step." <i class="fas fa-star"></i></p>
-                </div>
                 
                 <?php if($error): ?>
                     <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <?php echo $error; ?></div>
@@ -510,10 +441,6 @@ if(isset($_POST['reset_password'])) {
             <?php elseif($step == 3): ?>
                 <h1>Success! 🎉</h1>
                 <p class="subtitle">Your password has been reset</p>
-
-                <div class="inspire-text">
-                    <p><i class="fas fa-crown"></i> "Now back to planning your perfect day!" <i class="fas fa-crown"></i></p>
-                </div>
                 
                 <div class="success-msg"><i class="fas fa-check-circle"></i> <?php echo $success; ?></div>
                 
@@ -524,18 +451,18 @@ if(isset($_POST['reset_password'])) {
 
     <script>
         function createPetal() {
-            const petals = ['🌸', '🌹', '🌺', '🌼', '🌸', '🌷', '🥀', '🌸', '🌼'];
+            const petals = ['🌸', '🌹', '🌺', '🌼', '🌸', '🌷', '🥀'];
             const petal = document.createElement('div');
             petal.className = 'petal';
             petal.innerHTML = petals[Math.floor(Math.random() * petals.length)];
             petal.style.left = Math.random() * 100 + '%';
-            petal.style.animationDuration = Math.random() * 6 + 4 + 's';
+            petal.style.animationDuration = Math.random() * 5 + 4 + 's';
             petal.style.animationDelay = Math.random() * 5 + 's';
-            petal.style.fontSize = Math.random() * 16 + 14 + 'px';
+            petal.style.fontSize = Math.random() * 16 + 12 + 'px';
             document.body.appendChild(petal);
-            setTimeout(() => petal.remove(), 12000);
+            setTimeout(() => petal.remove(), 10000);
         }
-        setInterval(createPetal, 600);
+        setInterval(createPetal, 800);
 
         function copyToken() {
             var token = document.getElementById("tokenCode").innerText;
