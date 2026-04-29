@@ -1207,28 +1207,28 @@ $planners_for_user = mysqli_query($conn, "SELECT * FROM wedding_planners WHERE s
                 <i class="fas fa-images"></i> Wedding Gallery
             </div>
             <div class="gallery-grid">
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1519741497674-611481863552?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/1200x/07/59/b6/0759b60e18b57416f1f38254b037d408.jpg')">
                     <img src="https://suterahall.com/wp-content/uploads/2024/10/Harga-WO-Pernikahan-Wedding-Organizer-1024x585.jpg" alt="Wedding 1">
                 </div>
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/1200x/78/e2/95/78e2957bc5b4b065f4e547258989a4b4.jpg')">
                     <img src="https://lovary.co.id/userfiles/image_ck_by_user/15989/images/project%201/Our%20next%20chapter%20begins.%20Special%20thanks%20to%20our%20vendors-Wedding%20Organizer%20by%20%40yesido_official%20Venue%20by%20%40rumahduasejoli%20Wedding%20Ring%20by%20%40lovarycoid%20Seserahan%20%26%20Ring%20Box%20by%20%40seserahan.by.kala%20Mahar%20by%20%40treka.jpg">
                 </div>
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/1200x/44/bf/3b/44bf3ba04807db70ee85b51dfdfa4213.jpg')">
                     <img src="https://images.weddingku.com/images/upload/partners/73559/product/115587/images800/8585321262710704994.jpg">
                 </div>
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/736x/bf/af/76/bfaf76947230fe910e0e5743966b8349.jpg')">
                     <img src="https://i.pinimg.com/736x/bf/df/d3/bfdfd344ee3899fefb53a7e3e41fdbba.jpg">
                 </div>
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/1200x/f8/44/58/f8445824cb5a621a77f413cccbbf6f92.jpg')">
                     <img src="https://www.passionjewelry.co.id/uploads/ini-dia-6-tugas-wedding-organizer-yang-kamu-perlu-tahu-2121-2020-12-30-085726.jpg">
                 </div>
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1519741347686-c1e0aadf4611?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/1200x/a2/9e/07/a29e07388d4d9bdba96401a6d0b358c7.jpg')">
                     <img src="https://i.pinimg.com/736x/79/04/9b/79049b8f19d7634e5d2e09c9ecd21e71.jpg">
                 </div>
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/736x/6e/5a/00/6e5a002d8cc07ad5e7af4200abfb8d9a.jpg')">
                     <img src="https://medinacatering.id/wp-content/uploads/2019/10/Catering-Set-Up-Gallery-6-768x960.jpg">
                 </div>
-                <div class="gallery-item" onclick="openFullscreen('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800')">
+                <div class="gallery-item" onclick="openFullscreen('https://i.pinimg.com/736x/38/01/f2/3801f2e376cf9263350467d5c97ef51c.jpg')">
                     <img src="https://i.pinimg.com/736x/1e/4a/ed/1e4aed57703315b9f31c9bb2dc928605.jpg">
                 </div>
             </div>
