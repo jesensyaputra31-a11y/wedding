@@ -1,39 +1,38 @@
 <?php
-session_start(); // <-- INI PENTING! Harus ada di paling atas
+session_start(); // <-- INI YANG PALING PENTING! Harus ada di baris pertama
 require_once 'php/config.php';
 
 $error = '';
 $success = '';
 $step = 1;
 
-// Cek session untuk menentukan step
-if(isset($_SESSION['reset_step']) && $_SESSION['reset_step'] == 2) {
-    $step = 2;
-}
-if(isset($_SESSION['reset_step']) && $_SESSION['reset_step'] == 3) {
-    $step = 3;
-}
-
-// Cek parameter URL
+// Ambil step dari URL atau session
 if(isset($_GET['step'])) {
-    if($_GET['step'] == 1) {
+    if($_GET['step'] == 2 && isset($_SESSION['reset_token'])) {
+        $step = 2;
+    } elseif($_GET['step'] == 3) {
+        $step = 3;
+        unset($_SESSION['reset_step']);
+    } elseif($_GET['step'] == 1) {
         $step = 1;
         unset($_SESSION['reset_step']);
         unset($_SESSION['reset_token']);
         unset($_SESSION['reset_email']);
-    } elseif($_GET['step'] == 2 && isset($_SESSION['reset_token'])) {
-        $step = 2;
-    } elseif($_GET['step'] == 3) {
-        $step = 3;
     }
+} elseif(isset($_SESSION['reset_step']) && $_SESSION['reset_step'] == 2) {
+    $step = 2;
+} elseif(isset($_SESSION['reset_step']) && $_SESSION['reset_step'] == 3) {
+    $step = 3;
 }
 
+// Cek dan buat kolom reset_token jika belum ada
 $check_token = mysqli_query($conn, "SHOW COLUMNS FROM users LIKE 'reset_token'");
 if(mysqli_num_rows($check_token) == 0) {
     mysqli_query($conn, "ALTER TABLE users ADD COLUMN reset_token VARCHAR(255) NULL");
     mysqli_query($conn, "ALTER TABLE users ADD COLUMN reset_expires DATETIME NULL");
 }
 
+// Proses request reset password (step 1)
 if(isset($_POST['request_reset'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     
@@ -51,10 +50,8 @@ if(isset($_POST['request_reset'])) {
             $_SESSION['reset_email'] = $email;
             $_SESSION['reset_token'] = $token;
             $_SESSION['reset_step'] = 2;
-            $success = "Reset code has been generated.";
-            $step = 2;
             
-            // Redirect ke step 2
+            // REDIRECT ke halaman step 2
             header("Location: forgot-password.php?step=2");
             exit();
         } else {
@@ -65,6 +62,7 @@ if(isset($_POST['request_reset'])) {
     }
 }
 
+// Proses reset password (step 2)
 if(isset($_POST['reset_password'])) {
     $new_password = $_POST['new_password'];
     $confirm_password = $_POST['confirm_password'];
@@ -88,8 +86,8 @@ if(isset($_POST['reset_password'])) {
                 unset($_SESSION['reset_email']);
                 unset($_SESSION['reset_token']);
                 unset($_SESSION['reset_step']);
-                $step = 3;
                 
+                // REDIRECT ke halaman sukses
                 header("Location: forgot-password.php?step=3");
                 exit();
             } else {
@@ -99,6 +97,8 @@ if(isset($_POST['reset_password'])) {
             $error = "Invalid or expired token! Please start over.";
             $step = 1;
             unset($_SESSION['reset_step']);
+            header("Location: forgot-password.php?step=1");
+            exit();
         }
     }
 }
@@ -122,7 +122,7 @@ if(isset($_POST['reset_password'])) {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             position: relative;
-            overflow-y: auto; /* Bisa scroll ke bawah */
+            overflow-y: auto;
             overflow-x: hidden;
         }
 
@@ -192,7 +192,6 @@ if(isset($_POST['reset_password'])) {
             padding: 80px 20px;
         }
 
-        /* CARD DENGAN EFEK SWIPE & SCROLL */
         .reset-card {
             max-width: 500px;
             width: 100%;
@@ -201,48 +200,47 @@ if(isset($_POST['reset_password'])) {
             border-radius: 48px;
             padding: 45px 40px;
             box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.4), 
-                        0 0 0 1px rgba(212, 175, 55, 0.2),
-                        inset 0 1px 0 rgba(255,255,255,0.3);
-            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            will-change: transform;
-            cursor: grab;
+                        0 0 0 1px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s ease;
             animation: fadeInUp 0.6s ease-out;
-            /* Penting untuk swipe di HP */
-            touch-action: pan-y pinch-zoom; /* Izinkan scroll vertikal */
+            cursor: grab;
+            touch-action: pan-y pinch-zoom;
         }
 
         .reset-card:active {
             cursor: grabbing;
         }
 
-        .reset-card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 40px 70px -25px rgba(0, 0, 0, 0.5), 
-                        0 0 0 1px rgba(212, 175, 55, 0.3);
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Animasi swipe */
         @keyframes cardSwipeLeft {
             0% { transform: translateX(0) rotate(0deg); opacity: 1; }
-            30% { transform: translateX(-30px) rotate(-5deg); }
-            100% { transform: translateX(-400px) rotate(-15deg); opacity: 0; }
+            100% { transform: translateX(-300px) rotate(-10deg); opacity: 0; }
         }
 
         @keyframes cardSwipeRight {
             0% { transform: translateX(0) rotate(0deg); opacity: 1; }
-            30% { transform: translateX(30px) rotate(5deg); }
-            100% { transform: translateX(400px) rotate(15deg); opacity: 0; }
+            100% { transform: translateX(300px) rotate(10deg); opacity: 0; }
         }
 
         .card-swipe-left {
-            animation: cardSwipeLeft 0.5s ease forwards !important;
+            animation: cardSwipeLeft 0.4s ease forwards !important;
         }
 
         .card-swipe-right {
-            animation: cardSwipeRight 0.5s ease forwards !important;
+            animation: cardSwipeRight 0.4s ease forwards !important;
         }
 
-        /* Swipe indicator */
         .swipe-indicator {
             text-align: center;
             position: fixed;
@@ -251,7 +249,6 @@ if(isset($_POST['reset_password'])) {
             right: 0;
             z-index: 10;
             opacity: 0.7;
-            transition: opacity 0.3s;
             pointer-events: none;
         }
 
@@ -275,17 +272,6 @@ if(isset($_POST['reset_password'])) {
             50% { transform: translateX(5px); }
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         .icon-wrapper {
             text-align: center;
             margin-bottom: 25px;
@@ -297,12 +283,6 @@ if(isset($_POST['reset_password'])) {
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: iconPulse 2s ease infinite;
-        }
-
-        @keyframes iconPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
         }
 
         .reset-card h1 {
@@ -381,35 +361,11 @@ if(isset($_POST['reset_password'])) {
             cursor: pointer;
             transition: all 0.3s;
             margin: 10px 0 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
         }
 
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(212, 175, 55, 0.35);
-        }
-
-        .btn:active {
-            transform: translateY(0);
         }
 
         .error-msg, .success-msg {
@@ -420,18 +376,6 @@ if(isset($_POST['reset_password'])) {
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         .error-msg {
@@ -453,12 +397,6 @@ if(isset($_POST['reset_password'])) {
             margin: 20px 0;
             text-align: center;
             border: 1px solid rgba(212,175,55,0.2);
-            transition: all 0.3s;
-        }
-
-        .token-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
         .token-code {
@@ -482,11 +420,6 @@ if(isset($_POST['reset_password'])) {
             color: white;
             font-size: 12px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .copy-btn:hover {
-            transform: scale(1.05);
         }
 
         .back-link {
@@ -498,7 +431,6 @@ if(isset($_POST['reset_password'])) {
         .back-link a {
             color: #b48c5c;
             text-decoration: none;
-            transition: all 0.3s;
         }
 
         .back-link a:hover {
@@ -516,105 +448,44 @@ if(isset($_POST['reset_password'])) {
             width: 100%;
             text-align: center;
             font-weight: 600;
-            transition: all 0.3s;
         }
 
-        .success-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.35);
+        .info-msg {
+            background: #e8f4fd;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #2196F3;
         }
 
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #D4AF37;
-            border-radius: 10px;
-        }
-
-        /* Responsif HP */
         @media (max-width: 550px) {
             .container {
                 padding: 60px 16px;
                 align-items: flex-start;
             }
-            
             .reset-card {
                 padding: 35px 25px;
                 border-radius: 36px;
-                margin-top: 20px;
             }
-            
             .reset-card h1 {
                 font-size: 26px;
             }
-            
             .icon-wrapper i {
                 font-size: 44px;
             }
-            
-            .input-group input {
-                padding: 12px 0;
-                font-size: 14px;
-            }
-            
-            .btn, .success-btn {
-                padding: 12px;
-            }
-            
-            .token-card {
-                padding: 15px;
-            }
-            
-            .token-code {
-                font-size: 11px;
-                padding: 10px;
-            }
         }
 
-        @media (max-width: 380px) {
-            .reset-card {
-                padding: 25px 20px;
-            }
-            
-            .reset-card h1 {
-                font-size: 24px;
-            }
-            
-            .subtitle {
-                font-size: 12px;
-            }
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-
-        .btn-loading {
-            position: relative;
-            pointer-events: none;
-            opacity: 0.7;
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
         }
-        
-        .btn-loading::after {
-            content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            top: 50%;
-            right: 20px;
-            margin-top: -8px;
-            border: 2px solid white;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.6s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        ::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -665,16 +536,12 @@ if(isset($_POST['reset_password'])) {
                     <div class="error-msg"><i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
                 
-                <?php if($success): ?>
-                    <div class="success-msg"><i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success); ?></div>
-                <?php endif; ?>
-                
-                <form method="POST" id="resetForm">
+                <form method="POST">
                     <div class="input-group">
                         <label>EMAIL ADDRESS</label>
                         <input type="email" name="email" placeholder="your@email.com" required>
                     </div>
-                    <button type="submit" name="request_reset" class="btn" id="submitBtn">Send Reset Code</button>
+                    <button type="submit" name="request_reset" class="btn">Send Reset Code</button>
                     <div class="back-link"><a href="index.php">← Back to Login</a></div>
                 </form>
                 
@@ -692,11 +559,11 @@ if(isset($_POST['reset_password'])) {
                     <button type="button" onclick="copyToken()" class="copy-btn"><i class="fas fa-copy"></i> Copy Token</button>
                 </div>
                 
-                <div class="info-msg" style="background: #e8f4fd; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 12px; color: #2196F3;">
+                <div class="info-msg">
                     <i class="fas fa-info-circle"></i> Use the token above to reset your password. Token expires in 1 hour.
                 </div>
                 
-                <form method="POST" id="resetForm2">
+                <form method="POST">
                     <div class="input-group">
                         <label>RESET TOKEN</label>
                         <input type="text" name="token" placeholder="Paste or type the reset token" required>
@@ -709,7 +576,7 @@ if(isset($_POST['reset_password'])) {
                         <label>CONFIRM PASSWORD</label>
                         <input type="password" name="confirm_password" placeholder="Confirm new password" required>
                     </div>
-                    <button type="submit" name="reset_password" class="btn" id="submitBtn2">Reset Password</button>
+                    <button type="submit" name="reset_password" class="btn">Reset Password</button>
                     <div class="back-link">
                         <a href="forgot-password.php?step=1">← Start Over</a> | 
                         <a href="index.php">Back to Login</a>
@@ -727,10 +594,6 @@ if(isset($_POST['reset_password'])) {
                 </div>
                 
                 <a href="index.php" class="success-btn"><i class="fas fa-sign-in-alt"></i> Login Now →</a>
-                
-                <div class="back-link" style="margin-top: 20px;">
-                    <a href="index.php">← Back to Homepage</a>
-                </div>
             <?php endif; ?>
         </div>
     </div>
@@ -740,7 +603,7 @@ if(isset($_POST['reset_password'])) {
     </div>
 
     <script>
-        // Create falling petals
+        // Falling petals
         function createPetal() {
             const petals = ['🌸', '🌹', '🌺', '🌼', '🌸', '🌷', '🥀'];
             const petal = document.createElement('div');
@@ -755,15 +618,15 @@ if(isset($_POST['reset_password'])) {
         }
         setInterval(createPetal, 800);
 
-        // Copy token function
+        // Copy token
         function copyToken() {
             var token = document.getElementById("tokenCode");
             if(token) {
                 var tokenText = token.innerText;
                 navigator.clipboard.writeText(tokenText).then(function() {
-                    showToast("✅ Token copied successfully!");
+                    showToast("✅ Token copied!");
                 }).catch(function() {
-                    alert("Manual copy: " + tokenText);
+                    alert("Copy: " + tokenText);
                 });
             }
         }
@@ -772,27 +635,22 @@ if(isset($_POST['reset_password'])) {
         function showToast(message) {
             let toast = document.createElement('div');
             toast.innerHTML = message;
-            toast.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#1a1a2e; color:white; padding:12px 24px; border-radius:50px; font-size:14px; z-index:1001; animation:fadeInOut 2s ease; border-left:4px solid #D4AF37; white-space:nowrap;`;
+            toast.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:#1a1a2e; color:white; padding:12px 24px; border-radius:50px; font-size:14px; z-index:1001; border-left:4px solid #D4AF37; white-space:nowrap;`;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 2000);
         }
 
-        // ========== EFEK SWIPE PADA CARD (Hanya horizontal, tidak mengganggu scroll vertikal) ==========
+        // ========== EFEK SWIPE CARD ==========
         const card = document.getElementById('resetCard');
-        const swipeIndicator = document.getElementById('swipeIndicator');
         let startX = 0;
         let currentX = 0;
         let isDragging = false;
-        let dragStartTime = 0;
 
         if (card) {
-            // Touch events untuk HP (swipe horizontal saja)
             card.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
-                dragStartTime = Date.now();
                 isDragging = true;
                 card.style.transition = 'none';
-                if(swipeIndicator) swipeIndicator.style.opacity = '0.3';
             });
 
             card.addEventListener('touchmove', (e) => {
@@ -800,13 +658,11 @@ if(isset($_POST['reset_password'])) {
                 currentX = e.touches[0].clientX;
                 const diffX = currentX - startX;
                 
-                // Hanya swipe horizontal, tidak mengganggu scroll vertikal
                 if (Math.abs(diffX) > 10) {
-                    e.preventDefault(); // Prevent scroll only when swiping horizontally
+                    e.preventDefault();
                     const rotate = diffX * 0.03;
-                    const opacity = 1 - Math.abs(diffX) / 300;
                     card.style.transform = `translateX(${diffX}px) rotate(${rotate}deg)`;
-                    card.style.opacity = Math.max(0.5, opacity);
+                    card.style.opacity = 1 - Math.abs(diffX) / 300;
                 }
             });
 
@@ -814,12 +670,10 @@ if(isset($_POST['reset_password'])) {
                 if (!isDragging) return;
                 isDragging = false;
                 const diffX = currentX - startX;
-                const dragDuration = Date.now() - dragStartTime;
                 
-                card.style.transition = 'all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+                card.style.transition = 'all 0.3s ease';
                 
-                // Deteksi swipe yang cukup jauh atau cepat
-                if (Math.abs(diffX) > 80 || (Math.abs(diffX) > 40 && dragDuration < 200)) {
+                if (Math.abs(diffX) > 70) {
                     if (diffX > 0) {
                         card.classList.add('card-swipe-right');
                         showToast("👉 Swipe right!");
@@ -827,23 +681,18 @@ if(isset($_POST['reset_password'])) {
                         card.classList.add('card-swipe-left');
                         showToast("👈 Swipe left!");
                     }
-                    
                     setTimeout(() => {
                         card.style.transform = '';
                         card.style.opacity = '';
                         card.classList.remove('card-swipe-left', 'card-swipe-right');
-                    }, 500);
+                    }, 400);
                 } else {
                     card.style.transform = '';
                     card.style.opacity = '';
                 }
-                
-                setTimeout(() => {
-                    if(swipeIndicator) swipeIndicator.style.opacity = '0.7';
-                }, 500);
             });
             
-            // Mouse events untuk desktop
+            // Mouse events
             card.addEventListener('mousedown', (e) => {
                 startX = e.clientX;
                 isDragging = true;
@@ -855,11 +704,8 @@ if(isset($_POST['reset_password'])) {
                 if (!isDragging) return;
                 currentX = e.clientX;
                 const diffX = currentX - startX;
-                
                 if (Math.abs(diffX) > 10) {
-                    const rotate = diffX * 0.02;
-                    card.style.transform = `translateX(${diffX}px) rotate(${rotate}deg)`;
-                    card.style.opacity = 1 - Math.abs(diffX) / 300;
+                    card.style.transform = `translateX(${diffX}px) rotate(${diffX * 0.02}deg)`;
                 }
             });
             
@@ -867,10 +713,9 @@ if(isset($_POST['reset_password'])) {
                 if (!isDragging) return;
                 isDragging = false;
                 const diffX = currentX - startX;
-                card.style.transition = 'all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+                card.style.transition = 'all 0.3s ease';
                 card.style.cursor = 'grab';
-                
-                if (Math.abs(diffX) > 80) {
+                if (Math.abs(diffX) > 70) {
                     if (diffX > 0) {
                         card.classList.add('card-swipe-right');
                         showToast("👉 Swipe right!");
@@ -880,7 +725,7 @@ if(isset($_POST['reset_password'])) {
                     }
                     setTimeout(() => {
                         card.classList.remove('card-swipe-left', 'card-swipe-right');
-                    }, 500);
+                    }, 400);
                 }
                 card.style.transform = '';
                 card.style.opacity = '';
@@ -888,36 +733,6 @@ if(isset($_POST['reset_password'])) {
             
             card.style.cursor = 'grab';
         }
-
-        // Loading effect on form submit
-        const forms = document.querySelectorAll('form');
-        forms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                const btn = this.querySelector('#submitBtn, #submitBtn2, .btn');
-                if (btn && !btn.classList.contains('btn-loading')) {
-                    btn.classList.add('btn-loading');
-                    btn.disabled = true;
-                }
-            });
-        });
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
-                15% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                85% { opacity: 1; transform: translateX(-50%) translateY(0); }
-                100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Tampilkan notifikasi token jika di step 2
-        <?php if($step == 2 && isset($_SESSION['reset_token'])): ?>
-        setTimeout(function() {
-            showToast("📋 Token has been generated! Copy and use it.");
-        }, 500);
-        <?php endif; ?>
     </script>
 </body>
 </html>
